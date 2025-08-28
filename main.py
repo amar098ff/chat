@@ -43,7 +43,8 @@ def get_gemini_response(conversation_history):
         "generationConfig": {
             "topP": 0.7,
             "temperature": 0.8,
-            "topK": 40
+            "topK": 40,
+            "stopSequences": ["User:", "Assistant:"]
         }
     }
     response = requests.post(GEMINI_API_URL, headers=headers, params=params, json=data)
@@ -71,7 +72,7 @@ def get_gemini_response(conversation_history):
         return f"Error: {response.status_code} - {response.text}"
 
 def main():
-    print("AI Chatbot (Gemini API, Structured Output). Type 'exit' to quit.")
+    print("AI Chatbot (Gemini API, Structured Output, Stop Sequence). Type 'exit' to quit.")
     conversation_history = []
     while True:
         user_input = input("You: ")
