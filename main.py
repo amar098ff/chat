@@ -28,7 +28,10 @@ def get_gemini_response(conversation_history):
                     {"text": prompt}
                 ]
             }
-        ]
+        ],
+        "generationConfig": {
+            "topP": 0.7  # Updated Top P value for nucleus sampling
+        }
     }
     response = requests.post(GEMINI_API_URL, headers=headers, params=params, json=data)
     prompt_tokens = count_tokens(prompt)
