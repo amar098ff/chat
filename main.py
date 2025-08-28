@@ -30,7 +30,8 @@ def get_gemini_response(conversation_history):
             }
         ],
         "generationConfig": {
-            "topP": 0.7  # Updated Top P value for nucleus sampling
+            "topP": 0.7,        # Nucleus sampling
+            "temperature": 0.8  # Updated temperature for more creative responses
         }
     }
     response = requests.post(GEMINI_API_URL, headers=headers, params=params, json=data)
