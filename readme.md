@@ -1,22 +1,18 @@
 # AI Chatbot Project
 
 ## Project Overview
-
 This project is an **AI-powered chatbot** built in Python. The chatbot leverages artificial intelligence to understand user queries and generate relevant, human-like responses. The goal is to create an interactive assistant that can engage in meaningful conversations, answer questions, and provide assistance on a variety of topics.
 
 ## Project Idea
-
 The core idea is to develop a conversational agent that uses AI models (such as those based on Natural Language Processing) to interpret user input and respond intelligently. The chatbot will be implemented in a single Python file for simplicity and ease of deployment.
 
 ## Features
-
 - **Natural Language Understanding:** The chatbot can comprehend and process user messages using NLP techniques.
 - **Contextual Responses:** It maintains context within a conversation to provide coherent and relevant answers.
 - **Extensible Knowledge Base:** The chatbot can be extended to answer domain-specific questions or integrated with external APIs.
 - **Simple Interface:** Interaction is via the command line, making it lightweight and easy to use.
 
 ## Technical Implementation
-
 - **Language:** Python
 - **AI Model:** Utilizes a pre-trained NLP model (such as OpenAI's GPT or HuggingFace Transformers) for generating responses.
 - **Single File Structure:** All logic, including model loading, message handling, and conversation loop, is contained in one Python file (e.g., `chatbot.py`).
