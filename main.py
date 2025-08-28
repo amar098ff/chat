@@ -1,18 +1,20 @@
-
 import requests
 
 GEMINI_API_KEY = "AIzaSyD_mglywUAV374j_s5wJa9mF1NWW8GoATY"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
 
-def get_gemini_response(user_input):
+def get_gemini_response(conversation_history):
     headers = {
         "Content-Type": "application/json"
     }
     params = {
         "key": GEMINI_API_KEY
     }
-    # Zero-shot prompt
-    prompt = f"You are a helpful assistant. Answer the user's question as accurately as possible.\nUser: {user_input}\nAssistant:"
+    # Dynamic prompt: include conversation history
+    prompt = "You are a helpful assistant. Continue the conversation based on the following history:\n"
+    for turn in conversation_history:
+        prompt += f"{turn['role']}: {turn['content']}\n"
+    prompt += "Assistant:"
     data = {
         "contents": [
             {
@@ -33,14 +35,16 @@ def get_gemini_response(user_input):
         return f"Error: {response.status_code} - {response.text}"
 
 def main():
-    print("AI Chatbot (Gemini API, Zero-Shot Prompting). Type 'exit' to quit.")
+    print("AI Chatbot (Gemini API, Dynamic Prompting). Type 'exit' to quit.")
+    conversation_history = []
     while True:
         user_input = input("You: ")
         if user_input.lower() == "exit":
             break
-        response = get_gemini_response(user_input)
+        conversation_history.append({"role": "User", "content": user_input})
+        response = get_gemini_response(conversation_history)
         print("Bot:", response)
+        conversation_history.append({"role": "Assistant", "content": response})
 
 if __name__ == "__main__":
     main()
-```
