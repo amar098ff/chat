@@ -1,4 +1,5 @@
 import requests
+import json
 
 GEMINI_API_KEY = "AIzaSyD_mglywUAV374j_s5wJa9mF1NWW8GoATY"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
@@ -16,11 +17,21 @@ def get_gemini_response(conversation_history):
     params = {
         "key": GEMINI_API_KEY
     }
-    # Dynamic prompt: include conversation history
-    prompt = "You are a helpful assistant. Continue the conversation based on the following history:\n"
+    # Structured output prompt: ask for JSON response
+    prompt = (
+        "You are a helpful assistant. "
+        "Continue the conversation based on the following history. "
+        "Respond in the following JSON format ONLY:\n"
+        "{\n"
+        '  "reply": "<your reply>",\n'
+        '  "sentiment": "<positive|neutral|negative>",\n'
+        '  "topic": "<main topic of the user\'s last message>"\n'
+        "}\n"
+    )
     for turn in conversation_history:
         prompt += f"{turn['role']}: {turn['content']}\n"
     prompt += "Assistant:"
+
     data = {
         "contents": [
             {
@@ -30,9 +41,9 @@ def get_gemini_response(conversation_history):
             }
         ],
         "generationConfig": {
-            "topP": 0.7,         # Nucleus sampling
-            "temperature": 0.8,  # More creative responses
-            "topK": 40           # Updated Top K for sampling
+            "topP": 0.7,
+            "temperature": 0.8,
+            "topK": 40
         }
     }
     response = requests.post(GEMINI_API_URL, headers=headers, params=params, json=data)
@@ -40,11 +51,18 @@ def get_gemini_response(conversation_history):
     if response.status_code == 200:
         result = response.json()
         try:
-            reply = result['candidates'][0]['content']['parts'][0]['text'].strip()
-            reply_tokens = count_tokens(reply)
+            raw_reply = result['candidates'][0]['content']['parts'][0]['text'].strip()
+            reply_tokens = count_tokens(raw_reply)
             total_tokens = prompt_tokens + reply_tokens
             print(f"[Token Usage] Prompt: {prompt_tokens}, Response: {reply_tokens}, Total: {total_tokens}")
-            return reply
+            # Try to parse the structured JSON output
+            try:
+                structured = json.loads(raw_reply)
+                print(f"[Structured Output] Sentiment: {structured.get('sentiment')}, Topic: {structured.get('topic')}")
+                return structured.get("reply", raw_reply)
+            except Exception:
+                print("[Warning] Could not parse structured output, showing raw reply.")
+                return raw_reply
         except (KeyError, IndexError):
             print(f"[Token Usage] Prompt: {prompt_tokens}, Response: 0, Total: {prompt_tokens}")
             return "Sorry, I couldn't understand the response."
@@ -53,7 +71,7 @@ def get_gemini_response(conversation_history):
         return f"Error: {response.status_code} - {response.text}"
 
 def main():
-    print("AI Chatbot (Gemini API, Dynamic Prompting). Type 'exit' to quit.")
+    print("AI Chatbot (Gemini API, Structured Output). Type 'exit' to quit.")
     conversation_history = []
     while True:
         user_input = input("You: ")
